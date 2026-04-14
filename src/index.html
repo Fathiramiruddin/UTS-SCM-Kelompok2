@@ -51,32 +51,52 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Contoh Mahasiswa</td>
-                        <td>12345678</td>
-                        <td>TRPL</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
+        // ✅ Ambil data dari LocalStorage
+        function getData() {
+            return JSON.parse(localStorage.getItem("mahasiswa")) || [];
+        }
+
+        // ✅ Simpan ke LocalStorage
+        function saveData(data) {
+            localStorage.setItem("mahasiswa", JSON.stringify(data));
+        }
+
+        // ✅ Tampilkan ke tabel
+        function renderTable() {
+            const table = document.querySelector("#mahasiswaTable tbody");
+            table.innerHTML = "";
+
+            const mahasiswa = getData();
+
+            mahasiswa.forEach(mhs => {
+                const row = table.insertRow();
+                row.insertCell(0).innerText = mhs.nama;
+                row.insertCell(1).innerText = mhs.nim;
+                row.insertCell(2).innerText = mhs.jurusan;
+            });
+        }
+
         // ✅ Tambah Data
         document.getElementById('biodataForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
             const nama = document.getElementById('nama').value;
             const nim = document.getElementById('nim').value;
             const jurusan = document.getElementById('jurusan').value;
 
-            const table = document.getElementById('mahasiswaTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            
-            newRow.insertCell(0).innerText = nama;
-            newRow.insertCell(1).innerText = nim;
-            newRow.insertCell(2).innerText = jurusan;
+            let mahasiswa = getData();
+            mahasiswa.push({ nama, nim, jurusan });
 
-            document.getElementById('biodataForm').reset();
+            saveData(mahasiswa);
+            renderTable();
+
+            this.reset();
         });
 
         // ✅ Search Data
@@ -86,13 +106,12 @@
 
             rows.forEach(row => {
                 const text = row.innerText.toLowerCase();
-                if (text.includes(keyword)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
+                row.style.display = text.includes(keyword) ? "" : "none";
             });
         });
+
+        // ✅ Load saat pertama kali
+        window.onload = renderTable;
     </script>
 </body>
 </html>

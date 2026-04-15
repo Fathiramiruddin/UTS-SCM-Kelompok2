@@ -38,7 +38,6 @@
         <div class="card">
             <h3>Daftar Mahasiswa Terdaftar</h3>
 
-            <!-- 🔍 SEARCH -->
             <input type="text" id="searchInput" placeholder="Cari data mahasiswa..." 
             style="margin-bottom:10px; padding:8px; width:100%;">
 
@@ -48,7 +47,7 @@
                         <th>Nama</th>
                         <th>NIM</th>
                         <th>Jurusan</th>
-                    </tr>
+                        <th>Aksi</th> </tr>
                 </thead>
                 <tbody>
                 </tbody>
@@ -57,6 +56,9 @@
     </div>
 
     <script>
+        // ✅ Variable global untuk melacak mode (Edit atau Tambah)
+        let editIndex = -1; 
+
         // ✅ Ambil data dari LocalStorage
         function getData() {
             return JSON.parse(localStorage.getItem("mahasiswa")) || [];
@@ -74,15 +76,35 @@
 
             const mahasiswa = getData();
 
-            mahasiswa.forEach(mhs => {
+            mahasiswa.forEach((mhs, index) => {
                 const row = table.insertRow();
                 row.insertCell(0).innerText = mhs.nama;
                 row.insertCell(1).innerText = mhs.nim;
                 row.insertCell(2).innerText = mhs.jurusan;
+                
+                // Tambahan: Tombol Edit di kolom Aksi
+                const aksiCell = row.insertCell(3);
+                aksiCell.innerHTML = `<button onclick="editData(${index})" style="background-color: #f39c12; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; font-size: 14px;">Edit</button>`;
             });
         }
 
-        // ✅ Tambah Data
+        // ✅ Tambahan: Fungsi untuk memasukkan data ke Form saat tombol Edit diklik
+        function editData(index) {
+            const mahasiswa = getData();
+            const mhs = mahasiswa[index];
+
+            document.getElementById('nama').value = mhs.nama;
+            document.getElementById('nim').value = mhs.nim;
+            document.getElementById('jurusan').value = mhs.jurusan;
+
+            editIndex = index;
+            
+            const submitBtn = document.querySelector('.btn-submit[type="submit"]');
+            submitBtn.innerText = "Perbarui Data";
+            submitBtn.style.backgroundColor = "#f39c12"; 
+        }
+
+        // ✅ Modifikasi: Tambah atau Perbarui Data
         document.getElementById('biodataForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -91,12 +113,33 @@
             const jurusan = document.getElementById('jurusan').value;
 
             let mahasiswa = getData();
-            mahasiswa.push({ nama, nim, jurusan });
+
+            if (editIndex === -1) {
+                // Mode Tambah Data Baru
+                mahasiswa.push({ nama, nim, jurusan });
+            } else {
+                // Mode Perbarui Data Lama
+                mahasiswa[editIndex] = { nama, nim, jurusan };
+                
+                // Kembalikan ke mode awal setelah update
+                editIndex = -1;
+                const submitBtn = document.querySelector('.btn-submit[type="submit"]');
+                submitBtn.innerText = "Simpan Data";
+                submitBtn.style.backgroundColor = "#3498db"; 
+            }
 
             saveData(mahasiswa);
             renderTable();
 
             this.reset();
+        });
+
+        // ✅ Tambahan: Kembalikan tombol jika di-reset manual
+        document.getElementById('biodataForm').addEventListener('reset', function() {
+            editIndex = -1;
+            const submitBtn = document.querySelector('.btn-submit[type="submit"]');
+            submitBtn.innerText = "Simpan Data";
+            submitBtn.style.backgroundColor = "#3498db";
         });
 
         // ✅ Search Data

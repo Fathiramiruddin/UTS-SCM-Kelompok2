@@ -108,6 +108,7 @@
             border: 1px solid #ccc;
         }
 
+        /* ✅ TABLE FINAL */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -132,7 +133,10 @@
             padding: 12px;
             text-align: center;
             border-bottom: 1px solid #eee;
-            transition: 0.3s;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease-in-out;
         }
 
         tbody tr:nth-child(even) {
@@ -142,23 +146,6 @@
         tbody tr:hover {
             background-color: #e6ecff;
             transform: scale(1.01);
-            transition: 0.2s ease-in-out;
-        }
-
-        th {
-            background: #667eea;
-            color: white;
-            padding: 10px;
-        }
-
-        td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-        }
-
-        tr:hover {
-            background: #f5f7ff;
         }
 
         @media (max-width: 600px) {

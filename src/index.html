@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Biodata Mahasiswa - UTS SCM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sistem Biodata Mahasiswa</h1>
+        <p class="subtitle">Tugas UTS Manajemen Konfigurasi Perangkat Lunak</p>
+        
+        <div class="card">
+            <h3>Input Data Mahasiswa</h3>
+            <form id="biodataForm">
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap:</label>
+                    <input type="text" id="nama" required placeholder="Masukkan nama lengkap">
+                </div>
+                <div class="form-group">
+                    <label for="nim">NIM:</label>
+                    <input type="text" id="nim" required placeholder="Masukkan NIM (Hanya Angka)" pattern="[0-9]+" title="NIM hanya boleh berisi angka">
+                </div>
+                <div class="form-group">
+                    <label for="jurusan">Jurusan:</label>
+                    <select id="jurusan">
+                        <option value="Teknologi Rekayasa Perangkat Lunak">Teknologi Rekayasa Perangkat Lunak</option>
+                        <option value="Teknik Informatika">Teknik Informatika</option>
+                        <option value="Sistem Informasi">Sistem Informasi</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit">Simpan Data</button>
+                <button type="reset" style="background-color: #95a5a6; margin-top: 10px;" class="btn-submit">Reset Form</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Daftar Mahasiswa Terdaftar</h3>
+
+            <input type="text" id="searchInput" placeholder="Cari data mahasiswa..." 
+            style="margin-bottom:10px; padding:8px; width:100%;">
+
+            <table id="mahasiswaTable">
+                <thead>
+                    <tr>
+                        <th>No.</th> <th>Nama (A-Z)</th> <th>NIM</th>
+                        <th>Jurusan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let editIndex = -1; 
+
+        // ✅ Ambil data dari LocalStorage
+        function getData() {
+            return JSON.parse(localStorage.getItem("mahasiswa")) || [];
+        }
+
+        // ✅ Simpan ke LocalStorage dan urutkan
+        function saveData(data) {
+            // LOGIC IMPROVEMENT: Sorting A-Z berdasarkan Nama sebelum disimpan
+            data.sort((a, b) => a.nama.localeCompare(b.nama));
+            localStorage.setItem("mahasiswa", JSON.stringify(data));
+        }
+
+        // ✅ Tampilkan ke tabel
+        function renderTable() {
+            const table = document.querySelector("#mahasiswaTable tbody");
+            table.innerHTML = "";
+
+            const mahasiswa = getData();
+
+            mahasiswa.forEach((mhs, index) => {
+                const row = table.insertRow();
+                row.insertCell(0).innerText = index + 1; // Penomoran Otomatis
+                row.insertCell(1).innerText = mhs.nama;
+                row.insertCell(2).innerText = mhs.nim;
+                row.insertCell(3).innerText = mhs.jurusan;
+                
+                // Tombol Edit dan Hapus
+                const aksiCell = row.insertCell(4);
+                aksiCell.innerHTML = `
+                    <button onclick="editData(${index})" style="background-color: #f39c12; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; font-size: 14px; margin-right: 5px;">Edit</button>
+                    <button onclick="deleteData(${index})" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; font-size: 14px;">Hapus</button>
+                `;
+            });
+        }
+
+        // ✅ Fungsi Edit Data
+        function editData(index) {
+            const mahasiswa = getData();
+            const mhs = mahasiswa[index];
+
+            document.getElementById('nama').value = mhs.nama;
+            document.getElementById('nim').value = mhs.nim;
+            document.getElementById('jurusan').value = mhs.jurusan;
+
+            editIndex = index;
+            
+            const submitBtn = document.querySelector('.btn-submit[type="submit"]');
+            submitBtn.innerText = "Perbarui Data";
+            submitBtn.style.backgroundColor = "#f39c12"; 
+        }
+
+        // ✅ Fungsi Hapus Data
+        function deleteData(index) {
+            if (confirm("Apakah Anda yakin ingin menghapus data mahasiswa ini?")) {
+                let mahasiswa = getData();
+                mahasiswa.splice(index, 1); 
+                saveData(mahasiswa);
+                renderTable();
+            }
+        }
+
+        // ✅ Tambah atau Perbarui Data
+        document.getElementById('biodataForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // LOGIC IMPROVEMENT: Penggunaan .trim() untuk membersihkan spasi awal/akhir
+            const nama = document.getElementById('nama').value.trim();
+            const nim = document.getElementById('nim').value.trim();
+            const jurusan = document.getElementById('jurusan').value;
+
+            // LOGIC IMPROVEMENT: Validasi tambahan dengan Regex jika browser tidak mendukung HTML5 pattern
+            const numberRegex = /^\d+$/;
+            if (!numberRegex.test(nim)) {
+                alert("NIM hanya boleh berisi angka!");
+                return;
+            }
+
+            let mahasiswa = getData();
+
+            // LOGIC IMPROVEMENT: Pengecekan NIM Ganda
+            const isDuplicate = mahasiswa.some((mhs, i) => mhs.nim === nim && i !== editIndex);
+            if (isDuplicate) {
+                alert("Gagal menyimpan! NIM '" + nim + "' sudah terdaftar.");
+                return; 
+            }
+
+            if (editIndex === -1) {
+                // Mode Tambah Data Baru
+                mahasiswa.push({ nama, nim, jurusan });
+            } else {
+                // Mode Perbarui Data Lama
+                mahasiswa[editIndex] = { nama, nim, jurusan };
+                
+                editIndex = -1;
+                const submitBtn = document.querySelector('.btn-submit[type="submit"]');
+                submitBtn.innerText = "Simpan Data";
+                submitBtn.style.backgroundColor = "#3498db"; 
+            }
+
+            saveData(mahasiswa);
+            renderTable();
+
+            this.reset();
+        });
+
+        // ✅ Reset Form
+        document.getElementById('biodataForm').addEventListener('reset', function() {
+            editIndex = -1;
+            const submitBtn = document.querySelector('.btn-submit[type="submit"]');
+            submitBtn.innerText = "Simpan Data";
+            submitBtn.style.backgroundColor = "#3498db";
+        });
+
+        // ✅ Search Data
+        document.getElementById("searchInput").addEventListener("keyup", function() {
+            const keyword = this.value.toLowerCase();
+            const rows = document.querySelectorAll("#mahasiswaTable tbody tr");
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(keyword) ? "" : "none";
+            });
+        });
+
+        // ✅ Load saat pertama kali
+        window.onload = renderTable;
+    </script>
+</body>
+</html>

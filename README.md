@@ -34,3 +34,8 @@ Data dapat diekspor ke file .csv yang bisa dibuka di Excel atau aplikasi spreads
 6. Dark Mode
 Terdapat tombol toggle 🌙 untuk beralih ke tampilan gelap (dark mode).
 
+Cara Menjalankan Aplikasi
+
+Untuk menjalankan sistem tersebut, langkah pertama yang perlu dilakukan adalah mengekstrak file project yang telah diunduh. Setelah itu, buka folder hasil ekstrak dan masuk ke dalam folder utama hingga menemukan file bernama index.html. File ini merupakan halaman utama dari sistem, sehingga dapat langsung dijalankan dengan cara mengklik dua kali file tersebut, dan secara otomatis akan terbuka di browser seperti Google Chrome atau Microsoft Edge. Selain itu, jika menggunakan Visual Studio Code, sistem juga dapat dijalankan dengan membuka folder project, kemudian klik kanan pada file index.html dan memilih opsi “Open with Live Server” agar tampilan lebih optimal. Karena sistem ini berbasis HTML dan CSS tanpa menggunakan database atau backend, maka tidak diperlukan instalasi tambahan dan cukup dijalankan melalui browser saja.
+
+<img width="1600" height="769" alt="WhatsApp Image 2026-04-18 at 1 46 23 AM" src="https://github.com/user-attachments/assets/df7b956c-670e-40d4-a27f-cf84923e1b87" />

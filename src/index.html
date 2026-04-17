@@ -117,7 +117,7 @@
         <h3>Input Data</h3>
         <form id="biodataForm">
             <input type="text" id="nama" placeholder="Nama" required>
-            <input type="text" id="nim" placeholder="NIM" required>
+            <input type="text" id="nim" placeholder="NIM (hanya angka)" required>
             <select id="jurusan">
                 <option>TRPL</option>
                 <option>TI</option>
@@ -129,7 +129,6 @@
 
     <div class="card">
         <h3>Daftar Mahasiswa</h3>
-
         <p id="totalData">Total Data: 0</p>
 
         <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
@@ -137,6 +136,13 @@
         <button onclick="clearAllData()">Hapus Semua</button>
 
         <input type="text" id="searchInput" placeholder="Cari...">
+
+        <select id="filterJurusan">
+            <option value="">Semua Jurusan</option>
+            <option value="TRPL">TRPL</option>
+            <option value="TI">TI</option>
+            <option value="SI">SI</option>
+        </select>
 
         <table>
             <thead>
@@ -168,9 +174,18 @@ function saveData(data) {
 function renderTable() {
     const data = getData();
     const tbody = document.getElementById("tableBody");
+    const filter = document.getElementById("filterJurusan").value;
+    const search = document.getElementById("searchInput").value.toLowerCase();
+
     tbody.innerHTML = "";
 
-    data.forEach((mhs, i) => {
+    let filteredData = data.filter(mhs => {
+        return (!filter || mhs.jurusan === filter) &&
+               (mhs.nama.toLowerCase().includes(search) ||
+                mhs.nim.includes(search));
+    });
+
+    filteredData.forEach((mhs, i) => {
         tbody.innerHTML += `
         <tr>
             <td>${i+1}</td>
@@ -184,8 +199,7 @@ function renderTable() {
         </tr>`;
     });
 
-    document.getElementById("totalData").innerText =
-        "Total Data: " + data.length;
+    document.getElementById("totalData").innerText = "Total Data: " + filteredData.length;
 }
 
 document.getElementById("biodataForm").addEventListener("submit", function(e){
@@ -202,15 +216,15 @@ document.getElementById("biodataForm").addEventListener("submit", function(e){
 
     let data = getData();
 
-    if (data.some((m,i)=>m.nim===nim && i!==editIndex)) {
+    if (data.some((m,i) => m.nim === nim && i !== editIndex)) {
         alert("NIM sudah ada!");
         return;
     }
 
     if (editIndex === -1) {
-        data.push({nama,nim,jurusan});
+        data.push({nama, nim, jurusan});
     } else {
-        data[editIndex] = {nama,nim,jurusan};
+        data[editIndex] = {nama, nim, jurusan};
         editIndex = -1;
     }
 
@@ -219,7 +233,7 @@ document.getElementById("biodataForm").addEventListener("submit", function(e){
     this.reset();
 });
 
-function editData(i){
+function editData(i) {
     const d = getData()[i];
     document.getElementById("nama").value = d.nama;
     document.getElementById("nim").value = d.nim;
@@ -227,29 +241,28 @@ function editData(i){
     editIndex = i;
 }
 
-function deleteData(i){
-    if(confirm("Hapus data?")){
+function deleteData(i) {
+    if (confirm("Hapus data?")) {
         let d = getData();
-        d.splice(i,1);
+        d.splice(i, 1);
         saveData(d);
         renderTable();
     }
 }
 
-function clearAllData(){
-    if(confirm("Hapus semua?")){
+function clearAllData() {
+    if (confirm("Hapus semua?")) {
         localStorage.removeItem("mahasiswa");
         renderTable();
     }
 }
 
-function exportCSV(){
+function exportCSV() {
     let data = getData();
     let csv = "Nama,NIM,Jurusan\n";
-    data.forEach(d=>{
+    data.forEach(d => {
         csv += `${d.nama},${d.nim},${d.jurusan}\n`;
     });
-
     let blob = new Blob([csv]);
     let a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -257,28 +270,12 @@ function exportCSV(){
     a.click();
 }
 
-function toggleDarkMode(){
+function toggleDarkMode() {
     document.body.classList.toggle("dark");
 }
 
-// Fitur Pencarian yang sudah diperbarui dengan sinkronisasi Total Data
-document.getElementById("searchInput").addEventListener("keyup", function(){
-    let val = this.value.toLowerCase();
-    let visibleCount = 0; // Variabel untuk menghitung baris yang tampil
-
-    document.querySelectorAll("tbody tr").forEach(row => {
-        // Cek apakah teks pada baris cocok dengan kata kunci
-        if (row.innerText.toLowerCase().includes(val)) {
-            row.style.display = ""; // Tampilkan baris
-            visibleCount++; // Tambahkan 1 ke penghitung
-        } else {
-            row.style.display = "none"; // Sembunyikan baris
-        }
-    });
-
-    // Perbarui teks "Total Data" dengan jumlah baris yang sedang tampil
-    document.getElementById("totalData").innerText = "Total Data: " + visibleCount;
-});
+document.getElementById("searchInput").addEventListener("keyup", renderTable);
+document.getElementById("filterJurusan").addEventListener("change", renderTable);
 
 window.onload = renderTable;
 </script>

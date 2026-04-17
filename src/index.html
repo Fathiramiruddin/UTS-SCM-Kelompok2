@@ -138,6 +138,14 @@
 
         <input type="text" id="searchInput" placeholder="Cari...">
 
+        <!-- FILTER JURUSAN -->
+        <select id="filterJurusan">
+            <option value="">Semua Jurusan</option>
+            <option value="TRPL">TRPL</option>
+            <option value="TI">TI</option>
+            <option value="SI">SI</option>
+        </select>
+
         <table>
             <thead>
                 <tr>
@@ -168,9 +176,20 @@ function saveData(data) {
 function renderTable() {
     const data = getData();
     const tbody = document.getElementById("tableBody");
+    const filter = document.getElementById("filterJurusan").value;
+    const search = document.getElementById("searchInput").value.toLowerCase();
+
     tbody.innerHTML = "";
 
-    data.forEach((mhs, i) => {
+    let filteredData = data.filter(mhs => {
+        const cocokJurusan = !filter || mhs.jurusan === filter;
+        const cocokSearch = mhs.nama.toLowerCase().includes(search) ||
+                            mhs.nim.includes(search);
+
+        return cocokJurusan && cocokSearch;
+    });
+
+    filteredData.forEach((mhs, i) => {
         tbody.innerHTML += `
         <tr>
             <td>${i+1}</td>
@@ -185,7 +204,7 @@ function renderTable() {
     });
 
     document.getElementById("totalData").innerText =
-        "Total Data: " + data.length;
+        "Total Data: " + filteredData.length;
 }
 
 document.getElementById("biodataForm").addEventListener("submit", function(e){
@@ -221,9 +240,9 @@ document.getElementById("biodataForm").addEventListener("submit", function(e){
 
 function editData(i){
     const d = getData()[i];
-    nama.value = d.nama;
-    nim.value = d.nim;
-    jurusan.value = d.jurusan;
+    document.getElementById("nama").value = d.nama;
+    document.getElementById("nim").value = d.nim;
+    document.getElementById("jurusan").value = d.jurusan;
     editIndex = i;
 }
 
@@ -261,12 +280,8 @@ function toggleDarkMode(){
     document.body.classList.toggle("dark");
 }
 
-document.getElementById("searchInput").addEventListener("keyup", function(){
-    let val = this.value.toLowerCase();
-    document.querySelectorAll("tbody tr").forEach(row=>{
-        row.style.display = row.innerText.toLowerCase().includes(val) ? "" : "none";
-    });
-});
+document.getElementById("searchInput").addEventListener("keyup", renderTable);
+document.getElementById("filterJurusan").addEventListener("change", renderTable);
 
 window.onload = renderTable;
 </script>

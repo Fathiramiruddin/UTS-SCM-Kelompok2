@@ -1,164 +1,129 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Biodata Mahasiswa - UTS SCM</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Biodata Mahasiswa</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-        body {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+body {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
 
-        body.dark {
-            background: #1e1e2f;
-        }
+body.dark {
+    background: #1e1e2f;
+}
 
-        .container {
-            width: 100%;
-            max-width: 900px;
-        }
+.container {
+    width: 100%;
+    max-width: 900px;
+}
 
-        h1 {
-            text-align: center;
-            color: white;
-        }
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
 
-        .subtitle {
-            text-align: center;
-            color: #ddd;
-            margin-bottom: 20px;
-        }
+body.dark .card {
+    background: #2c2c3e;
+    color: white;
+}
 
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
 
-        body.dark .card {
-            background: #2c2c3e;
-            color: white;
-        }
+.btn-submit {
+    padding: 10px;
+    width: 100%;
+    background: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
 
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        body.dark input, body.dark select {
-            background: #3a3a4f;
-            color: white;
-        }
+th {
+    background: #667eea;
+    color: white;
+    padding: 10px;
+}
 
-        .btn-submit {
-            padding: 10px;
-            width: 100%;
-            background: #3498db;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #667eea;
-            color: white;
-            padding: 10px;
-        }
-
-        td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        tbody tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-
-        tbody tr:hover {
-            background: #e6ecff;
-        }
-
-        body.dark th {
-            background: #444;
-        }
-
-        body.dark td {
-            border-color: #555;
-        }
-    </style>
+td {
+    padding: 10px;
+    text-align: center;
+}
+</style>
 </head>
 
 <body>
 <div class="container">
-    <h1>Sistem Biodata Mahasiswa</h1>
-    <p class="subtitle">Tugas UTS Manajemen Konfigurasi Perangkat Lunak</p>
 
-    <div class="card">
-        <h3>Input Data</h3>
-        <form id="biodataForm">
-            <input type="text" id="nama" placeholder="Nama" required>
-            <input type="text" id="nim" placeholder="NIM" required>
-            <select id="jurusan">
-                <option>TRPL</option>
-                <option>TI</option>
-                <option>SI</option>
-            </select>
-            <button type="submit" class="btn-submit">Simpan</button>
-        </form>
-    </div>
+<div class="card">
+<h3>Input Data</h3>
+<form id="biodataForm">
+    <input type="text" id="nama" placeholder="Nama" required>
 
-    <div class="card">
-        <h3>Daftar Mahasiswa</h3>
+    <!-- NIM tetap text tapi difilter -->
+    <input type="text" id="nim" placeholder="NIM (hanya angka)" required>
 
-        <p id="totalData">Total Data: 0</p>
+    <select id="jurusan">
+        <option>TRPL</option>
+        <option>TI</option>
+        <option>SI</option>
+    </select>
 
-        <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
-        <button onclick="exportCSV()">Export CSV</button>
-        <button onclick="clearAllData()">Hapus Semua</button>
+    <button type="submit" class="btn-submit">Simpan</button>
+</form>
+</div>
 
-        <input type="text" id="searchInput" placeholder="Cari...">
+<div class="card">
+<h3>Daftar Mahasiswa</h3>
+<p id="totalData">Total Data: 0</p>
 
-        <!-- FILTER JURUSAN -->
-        <select id="filterJurusan">
-            <option value="">Semua Jurusan</option>
-            <option value="TRPL">TRPL</option>
-            <option value="TI">TI</option>
-            <option value="SI">SI</option>
-        </select>
+<input type="text" id="searchInput" placeholder="Cari...">
 
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Nama</th>
-                    <th>NIM</th>
-                    <th>Jurusan</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
+<select id="filterJurusan">
+    <option value="">Semua Jurusan</option>
+    <option value="TRPL">TRPL</option>
+    <option value="TI">TI</option>
+    <option value="SI">SI</option>
+</select>
+
+<table>
+<thead>
+<tr>
+    <th>No</th>
+    <th>Nama</th>
+    <th>NIM</th>
+    <th>Jurusan</th>
+    <th>Aksi</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
 </div>
 
 <script>
@@ -182,11 +147,9 @@ function renderTable() {
     tbody.innerHTML = "";
 
     let filteredData = data.filter(mhs => {
-        const cocokJurusan = !filter || mhs.jurusan === filter;
-        const cocokSearch = mhs.nama.toLowerCase().includes(search) ||
-                            mhs.nim.includes(search);
-
-        return cocokJurusan && cocokSearch;
+        return (!filter || mhs.jurusan === filter) &&
+               (mhs.nama.toLowerCase().includes(search) ||
+                mhs.nim.includes(search));
     });
 
     filteredData.forEach((mhs, i) => {
@@ -214,7 +177,8 @@ document.getElementById("biodataForm").addEventListener("submit", function(e){
     const nim = document.getElementById("nim").value.trim();
     const jurusan = document.getElementById("jurusan").value;
 
-    if (!/^\\d+$/.test(nim)) {
+    // ✅ VALIDASI NIM (FIX DI SINI)
+    if (!/^\d+$/.test(nim)) {
         alert("NIM harus angka!");
         return;
     }
@@ -253,31 +217,6 @@ function deleteData(i){
         saveData(d);
         renderTable();
     }
-}
-
-function clearAllData(){
-    if(confirm("Hapus semua?")){
-        localStorage.removeItem("mahasiswa");
-        renderTable();
-    }
-}
-
-function exportCSV(){
-    let data = getData();
-    let csv = "Nama,NIM,Jurusan\\n";
-    data.forEach(d=>{
-        csv += `${d.nama},${d.nim},${d.jurusan}\\n`;
-    });
-
-    let blob = new Blob([csv]);
-    let a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "data.csv";
-    a.click();
-}
-
-function toggleDarkMode(){
-    document.body.classList.toggle("dark");
 }
 
 document.getElementById("searchInput").addEventListener("keyup", renderTable);
